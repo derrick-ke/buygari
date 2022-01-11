@@ -1,0 +1,98 @@
+[
+  {
+    "make": "Nissan",
+    "model": "Sunny",
+    "year": 2009,
+    "price": 200000,
+    "mileage": "43243",
+    "transmission": "Automatic",
+    "condition": "Used",
+    "location": "Nairobi, Kenya",
+    "views": 0,
+    "images": []
+  },
+  {
+    "make": "Toyota",
+    "model": "Fielder",
+    "year": 2015,
+    "price": 850000,
+    "mileage": "102154",
+    "transmission": "Automatic",
+    "condition": "Used",
+    "location": "Nairobi, Kenya",
+    "views": 0,
+    "images": []
+  },
+  {
+    "make": "Toyota",
+    "model": "Land Rover",
+    "year": 2018,
+    "price": 5500000,
+    "mileage": "42154",
+    "transmission": "Automatic",
+    "condition": "New",
+    "location": "Nairobi, Kenya",
+    "views": 0,
+    "images": []
+  },
+  {
+    "make": "Toyota",
+    "model": "Land Cruiser",
+    "year": 2018,
+    "price": 5500000,
+    "mileage": "42154",
+    "transmission": "Automatic",
+    "condition": "New",
+    "location": "Nairobi, Kenya",
+    "views": 0,
+    "images": []
+  },
+  {
+    "make": "Land Rover",
+    "model": "Defender",
+    "year": 2000,
+    "price": 550000,
+    "mileage": "142154",
+    "transmission": "Manual",
+    "condition": "Used",
+    "location": "Nairobi, Kenya",
+    "views": 0,
+    "images": []
+  },
+  {
+    "make": "Land Rover",
+    "model": "Discovery",
+    "year": 2009,
+    "price": 1050000,
+    "mileage": "95000",
+    "transmission": "Automatic",
+    "condition": "Used",
+    "location": "Nairobi, Kenya",
+    "views": 0,
+    "images": []
+  },
+  {
+    "make": "Nissan",
+    "model": "Patrol",
+    "year": 2015,
+    "price": 3000000,
+    "mileage": "95000",
+    "transmission": "Automatic",
+    "condition": "Used",
+    "location": "Nairobi, Kenya",
+    "views": 0,
+    "images": []
+  },
+  {
+    "make": "Suzuki",
+    "model": "Alto",
+    "year": 2019,
+    "price": 999000,
+    "mileage": "25000",
+    "transmission": "Automatic",
+    "condition": "New",
+    "location": "Nairobi, Kenya",
+    "views": 0,
+    "images": []
+  }
+]
