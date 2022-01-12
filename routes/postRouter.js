@@ -5,6 +5,10 @@ const Post = require('../models/postModel');
 const router = express.Router();
 
 router
+  .route('/under-500k')
+  .get(PostController.aliasCheapCars, PostController.getAllPosts);
+
+router
   .route('/')
   .get(PostController.getAllPosts)
   .post(PostController.createPost);

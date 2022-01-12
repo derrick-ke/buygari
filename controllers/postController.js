@@ -1,14 +1,55 @@
 const Post = require('../models/postModel');
 
+exports.aliasCheapCars = (req, res, next) => {
+  req.query.limit = 10;
+  req.query.price = { lte: '500000' };
+  next();
+};
+
 exports.getAllPosts = async (req, res) => {
   try {
+    //Build query
     const queryObj = { ...req.query };
-
     const excludedObj = ['limit', 'page', 'sort', 'fields'];
-
     excludedObj.forEach((el) => delete queryObj[el]);
 
-    const query = Post.find(queryObj);
+    let queryString = JSON.stringify(queryObj);
+    queryString = queryString.replace(
+      /\b(gte|lte|gt|lt)\b/g,
+      (match) => `$${match}`
+    );
+
+    let query = Post.find(JSON.parse(queryString));
+
+    //Sort query
+    if (req.query.sort) {
+      const sortBy = req.query.sort.split(',').join(' ');
+      query = query.sort(sortBy);
+    } else {
+      query = query.sort('-createdAt');
+    }
+
+    //Field limiting
+    if (req.query.fields) {
+      const fields = req.query.fields.split(',').join(' ');
+      query = query.select(fields);
+    } else {
+      query = query.select('-__v');
+    }
+
+    //Pagination
+    const page = req.query.page * 1 || 1;
+    const limit = req.query.limit * 1 || 10;
+    const skip = (page - 1) * limit;
+
+    query = query.skip(skip).limit(limit);
+
+    if (req.query.page) {
+      const numPosts = await Post.countDocuments();
+      if (skip >= numPosts) {
+        throw new Error('This page does not exist');
+      }
+    }
 
     const posts = await Post.find(query);
 
