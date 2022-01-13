@@ -1,4 +1,5 @@
 const Post = require('../models/postModel');
+const ApiFeatures = require('../utils/apiFeatures');
 
 exports.aliasCheapCars = (req, res, next) => {
   req.query.limit = 10;
@@ -8,50 +9,12 @@ exports.aliasCheapCars = (req, res, next) => {
 
 exports.getAllPosts = async (req, res) => {
   try {
-    //Build query
-    const queryObj = { ...req.query };
-    const excludedObj = ['limit', 'page', 'sort', 'fields'];
-    excludedObj.forEach((el) => delete queryObj[el]);
-
-    let queryString = JSON.stringify(queryObj);
-    queryString = queryString.replace(
-      /\b(gte|lte|gt|lt)\b/g,
-      (match) => `$${match}`
-    );
-
-    let query = Post.find(JSON.parse(queryString));
-
-    //Sort query
-    if (req.query.sort) {
-      const sortBy = req.query.sort.split(',').join(' ');
-      query = query.sort(sortBy);
-    } else {
-      query = query.sort('-createdAt');
-    }
-
-    //Field limiting
-    if (req.query.fields) {
-      const fields = req.query.fields.split(',').join(' ');
-      query = query.select(fields);
-    } else {
-      query = query.select('-__v');
-    }
-
-    //Pagination
-    const page = req.query.page * 1 || 1;
-    const limit = req.query.limit * 1 || 10;
-    const skip = (page - 1) * limit;
-
-    query = query.skip(skip).limit(limit);
-
-    if (req.query.page) {
-      const numPosts = await Post.countDocuments();
-      if (skip >= numPosts) {
-        throw new Error('This page does not exist');
-      }
-    }
-
-    const posts = await Post.find(query);
+    const features = new ApiFeatures(Post.find(), req.query)
+      .filter()
+      .sort()
+      .limit()
+      .paginate();
+    const posts = await features.query;
 
     res.status(200).json({
       status: 'success',
@@ -61,7 +24,7 @@ exports.getAllPosts = async (req, res) => {
   } catch (err) {
     res.status(404).json({
       status: 'error',
-      message: err,
+      message: [err, 'An error occured'],
     });
   }
 };
@@ -128,6 +91,68 @@ exports.deletePost = async (req, res) => {
     res.status(404).json({
       status: 'error',
       message: err,
+    });
+  }
+};
+
+exports.getPostStats = async (req, res) => {
+  try {
+    const stats = await Post.aggregate([
+      { $match: { make: 'Toyota', model: 'Premio' } },
+      {
+        $group: {
+          _id: '$year',
+          averagePrice: { $avg: '$price' },
+          minPrice: { $min: '$price' },
+          maxPrice: { $max: '$price' },
+        },
+      },
+    ]);
+
+    res.status(200).json({
+      status: 'success',
+      data: { stats },
+    });
+  } catch (error) {
+    res.status(404).json({
+      status: 'error',
+      message: error,
+    });
+  }
+};
+
+exports.getPostStatsById = async (req, res) => {
+  try {
+    const post = Post.findById(req.params.id);
+
+    const stats = await Post.aggregate([
+      {
+        $match: {
+          make: `${post.make}`,
+          model: `${post.model}`,
+        },
+      },
+      {
+        $group: {
+          _id: '$year',
+          averagePrice: { $avg: '$price' },
+          minPrice: { $min: '$price' },
+          maxPrice: { $max: '$price' },
+        },
+      },
+      {
+        $match: { _id: { $eq: `${post.year}` * 1 } },
+      },
+    ]);
+
+    res.status(200).json({
+      status: 'success',
+      data: { stats },
+    });
+  } catch (error) {
+    res.status(404).json({
+      status: 'error',
+      message: error,
     });
   }
 };

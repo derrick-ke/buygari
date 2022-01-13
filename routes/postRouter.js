@@ -1,12 +1,13 @@
 const express = require('express');
 const PostController = require('../controllers/postController');
-const Post = require('../models/postModel');
 
 const router = express.Router();
 
 router
   .route('/under-500k')
   .get(PostController.aliasCheapCars, PostController.getAllPosts);
+
+router.route('/post-stats').get(PostController.getPostStats);
 
 router
   .route('/')
