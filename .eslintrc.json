@@ -9,6 +9,8 @@
     "eqeqeq": "off",
     "spaced-comment": "off",
     "no-process-exit": "off",
+    "func-names": "off",
+    "no-param-reassign": "off",
     "no-unused-vars": ["warn", { "argsIgnorePattern": "req|res|next|val" }]
   }
 }
