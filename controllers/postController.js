@@ -52,6 +52,10 @@ exports.updatePost = catchAsync(async (req, res, next) => {
     runValidators: true,
   });
 
+  if (!post) {
+    return next(new AppError('No post found with that ID', 404));
+  }
+
   res.status(200).json({
     status: 'success',
     data: { post },
@@ -59,7 +63,11 @@ exports.updatePost = catchAsync(async (req, res, next) => {
 });
 
 exports.deletePost = catchAsync(async (req, res, next) => {
-  await Post.findByIdAndDelete(req.params.id);
+  const post = await Post.findByIdAndDelete(req.params.id);
+
+  if (!post) {
+    return next(new AppError('No post found with that ID', 404));
+  }
 
   res.status(204).json({
     status: 'success',

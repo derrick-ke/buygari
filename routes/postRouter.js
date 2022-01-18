@@ -1,5 +1,6 @@
 const express = require('express');
 const PostController = require('../controllers/postController');
+const authController = require('../controllers/authController');
 
 const router = express.Router();
 
@@ -11,13 +12,17 @@ router.route('/post-stats').get(PostController.getPostStats);
 
 router
   .route('/')
-  .get(PostController.getAllPosts)
+  .get(authController.protect, PostController.getAllPosts)
   .post(PostController.createPost);
 
 router
   .route('/:id')
   .get(PostController.getPost)
   .patch(PostController.updatePost)
-  .delete(PostController.deletePost);
+  .delete(
+    authController.protect,
+    authController.restrictTo('admin', 'editor'),
+    PostController.deletePost
+  );
 
 module.exports = router;
