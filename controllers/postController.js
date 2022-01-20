@@ -1,7 +1,6 @@
 const Post = require('../models/postModel');
-const ApiFeatures = require('../utils/apiFeatures');
 const catchAsync = require('../utils/catchAsync');
-const AppError = require('../utils/appError');
+const factory = require('./handlerFactory');
 
 exports.aliasCheapCars = (req, res, next) => {
   req.query.limit = 10;
@@ -9,71 +8,19 @@ exports.aliasCheapCars = (req, res, next) => {
   next();
 };
 
-exports.getAllPosts = catchAsync(async (req, res, next) => {
-  const features = new ApiFeatures(Post.find(), req.query)
-    .filter()
-    .sort()
-    .limit()
-    .paginate();
-  const posts = await features.query;
+exports.getAllPosts = factory.getAllDocs(Post);
+exports.getPost = factory.getOne(Post, { path: 'reviews' });
 
-  res.status(200).json({
-    status: 'success',
-    results: posts.length,
-    data: posts,
-  });
-});
+exports.setUserId = (req, res, next) => {
+  req.body.user = req.user.id;
+  next();
+};
 
-exports.getPost = catchAsync(async (req, res, next) => {
-  const post = await Post.findById(req.params.id);
+exports.createPost = factory.createOne(Post);
 
-  if (!post) {
-    return next(new AppError('No post found with that ID', 404));
-  }
+exports.updatePost = factory.updateOne(Post);
 
-  res.status(200).json({
-    status: 'success',
-    data: { post },
-  });
-});
-
-exports.createPost = catchAsync(async (req, res, next) => {
-  const post = await Post.create(req.body);
-
-  res.status(201).json({
-    status: 'success',
-    data: { post },
-  });
-});
-
-exports.updatePost = catchAsync(async (req, res, next) => {
-  const post = await Post.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
-    runValidators: true,
-  });
-
-  if (!post) {
-    return next(new AppError('No post found with that ID', 404));
-  }
-
-  res.status(200).json({
-    status: 'success',
-    data: { post },
-  });
-});
-
-exports.deletePost = catchAsync(async (req, res, next) => {
-  const post = await Post.findByIdAndDelete(req.params.id);
-
-  if (!post) {
-    return next(new AppError('No post found with that ID', 404));
-  }
-
-  res.status(204).json({
-    status: 'success',
-    message: 'Post was deleted successfully',
-  });
-});
+exports.deletePost = factory.deleteOne(Post);
 
 exports.getPostStats = catchAsync(async (req, res, next) => {
   const stats = await Post.aggregate([

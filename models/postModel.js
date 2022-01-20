@@ -55,6 +55,10 @@ const postSchema = new mongoose.Schema(
     color: String,
     engine: String,
     body: String,
+    user: {
+      type: mongoose.Schema.ObjectId,
+      ref: 'User',
+    },
   },
   {
     toJSON: { virtuals: true },
@@ -64,6 +68,20 @@ const postSchema = new mongoose.Schema(
 
 postSchema.virtual('title').get(function () {
   return `${this.year} ${this.make} ${this.model}`;
+});
+
+postSchema.virtual('reviews', {
+  ref: 'Review',
+  foreignField: 'post',
+  localField: '_id',
+});
+
+postSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: 'user',
+    select: '-__v',
+  });
+  next();
 });
 
 const Post = mongoose.model('Post', postSchema);
